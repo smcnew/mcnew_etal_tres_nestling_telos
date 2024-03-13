@@ -7,7 +7,6 @@ library(lmerTest)
 library(sjPlot)
 library(tidyr)
 library(coxme) # for survival analysis
-
 library(survminer)
 library(survival)
 
@@ -47,30 +46,30 @@ ggthemr(palette = 'light', layout = "clean", text_size = 12, spacing = 1)
 # pattern_size = width of stripes
 # pattern_spacing = how close stripes are
 # scale_fill_manual(values = cols) # change the colors of the geoms
+# #
 # Wing and headbill ~ treatment  ---------------------------------------------
 
 # effects in 2018 of predator on wing and head; no difference in 2019
-mod5 <- lmer(d12_wing ~ predator + dull + scale(fbbright)  + (1|site_nest) + (1|gen_mom),
+mod5 <- lmer(d12_wing ~ predator + dull + scale(fbbright) + fage + (1|site_nest) + (1|gen_mom),
              data = nestling_data[nestling_data$year == "2018",]) #%>% summary
-mod6 <- lmer(d12_wing ~ predator + dull* scale(fbbright) +  (1|site_nest) + (1|gen_mom),
+mod6 <- lmer(d12_wing ~ predator + dull* scale(fbbright) + fage+  (1|site_nest) + (1|gen_mom),
              data = nestling_data[nestling_data$year == "2019",]) #%>% summary
 
 
-
-mod7 <- lmer(d12_head ~ predator + dull + scale(fbbright)+  (1|site_nest) ,
+mod7 <- lmer(d12_head ~ predator + dull + scale(fbbright) + fage +  (1|site_nest) ,
              data = nestling_data[nestling_data$year == "2018",]) #%>% summary
-mod8 <- lmer(d12_head ~ predator + dull * scale(fbbright) +  (1|site_nest) + (1|gen_mom),
+mod8 <- lmer(d12_head ~ predator + dull * scale(fbbright) + fage +  (1|site_nest) + (1|gen_mom),
              data = nestling_data[nestling_data$year == "2019",])
 
 tab_model(mod5, mod6,
           dv.labels = c("Wing length (2018)", "Wing length (2019)"),
           pred.labels = c("Intercept (Controls)", "Predation",
-                          "Dull", "Brightness (scaled)", "Dull x Brightness"))
+                          "Dull", "Brightness (scaled)", "Female age", "Dull x Brightness"))
 
 tab_model(mod7, mod8,
           dv.labels = c("Head-bill (2018)", "Head-bill (2019)"),
           pred.labels = c("Intercept (Controls)", "Predation",
-                          "Dull", "Brightness (scaled)", "Dull x Brightness"))
+                          "Dull", "Brightness (scaled)", "Female age", "Dull x Brightness"))
 
 
 
@@ -183,22 +182,22 @@ dev.off()
 # Nestling mass ~ treatment ----------------------------------------------------
 # Yes effect of mass early
 
-mod1 <- lm(d6_av_mass ~ predator + dull * scale(fbbright), data = nestdata2018[nestdata2018$year == "2018",])
-mod2 <- lm(d6_av_mass ~ predator + dull, data = nestdata2018[nestdata2018$year == "2019",])
-tab_model(mod1, mod2, dv.labels = c("2018", "2019"),
+mod1 <- lm(d6_av_mass ~ predator + dull * scale(fbbright) + fage, data = nestdata2018[nestdata2018$year == "2018",])
+mod2 <- lm(d6_av_mass ~ predator + dull + scale(fbbright) + fage, data = nestdata2018[nestdata2018$year == "2019",])
+tab_model(mod1, mod2, dv.labels = c("Av. 6 day old mass (2018)", "Av. 6. day old mass (2019)"),
           pred.labels = c("Intercept (Controls)", "Predation",
-                          "Dull", "Brightness (scaled)", "Dull x Brightness"))
+                          "Dull", "Brightness (scaled)", "Female age", "Dull x Brightness"))
 
 #No effects of mass later
-mod3 <- lmer(d12_mass ~ predator + dull  + (1|site_nest),
+mod3 <- lmer(d12_mass ~ predator + dull  +scale(fbbright) + fage + (1|site_nest),
      data = nestling_data[nestling_data$year == "2018",])
-mod4 <- lmer(d12_mass ~ predator + dull * scale(fbbright) + (1|site_nest),
+mod4 <- lmer(d12_mass ~  predator + dull * scale(fbbright) + fage  + (1|site_nest),
      data = nestling_data[nestling_data$year == "2019",])
-tab_model(mod3, mod4, dv.labels = c("2018", "2019"),
+tab_model(mod3, mod4, dv.labels = c("Day 12 mass 2018", "Day 12 mass 2019"),
           pred.labels = c("Intercept (Controls)", "Predation",
-                          "Dull", "Brightness (scaled)", "Dull x Brightness"))
+                          "Dull", "Brightness (scaled)", "Female age", "Dull x Brightness"))
 
-
+#
 # Supplemental plots mass x brightness  -----------------------------------
 pmass6_bright18 <- nestdata2018 %>% filter(year == 2018) %>%
   ggplot(aes(x = fbbright, y = d6_av_mass, color = dull)) +
@@ -503,26 +502,27 @@ dev.off()
 
 
 # Cort ~ treatments -----------------------------------------------------------------
+d18
 
+mod9 <- lmer(d12_base ~ predator + dull + scale(fbbright) + fage + (1|site_nest), data = d18) #%>% summary
+mod10 <- lmer(d12_stress ~ predator + dull  +  scale(fbbright) + fage + (1|site_nest), data = d18) #%>% summary
+mod11 <- lmer(d12_dex ~ predator + dull  + scale(fbbright) + fage + (1|site_nest), data = d18) #%>% summary
 
-mod9 <- lmer(d12_base ~ predator + dull + (1|site_nest), data = d18) #%>% summary
-mod10 <- lmer(d12_stress ~ predator + dull  + (1|site_nest), data = d18) #%>% summary
-mod11 <- lmer(d12_dex ~ predator + dull  + (1|site_nest), data = d18) #%>% summary
-
-mod12 <- lmer(d12_base ~ predator + dull  + (1|site_nest), data = d19 ) #%>% summary
-mod13 <- lmer(d12_stress ~ predator + dull  + (1|site_nest), data = d19 ) #%>% summary
-mod14 <- lmer(d12_dex ~ predator + dull + (1|site_nest), data = d19 ) #%>% summary
+mod12 <- lmer(d12_base ~ predator + dull + scale(fbbright) + fage + (1|site_nest), data = d19 ) #%>% summary
+mod13 <- lmer(d12_stress ~ predator + dull + scale(fbbright) + fage + (1|site_nest), data = d19 ) #%>% summary
+mod14 <- lmer(d12_dex ~ predator + dull+ scale(fbbright) + fage + (1|site_nest), data = d19 ) #%>% summary
 
 
 tab_model(mod9, mod10, mod11,
           dv.labels = c("base cort", "stress cort", "post-dex cort"),
-          pred.labels = c("Intercept (Controls)", "Predation", "Dull") )
+          pred.labels = c("Intercept (Controls)", "Predation", "Dull", "Female Brightness (scaled)",
+          "Female Age") )
 
 tab_model(mod12, mod13, mod14,
           dv.labels = c("base cort", "stress cort", "post-dex cort"),
-          pred.labels = c("Intercept (Controls)", "Predation", "Dull") )
+          pred.labels = c("Intercept (Controls)", "Predation", "Dull", "Female Brightness (scaled)", "Female Age") )
 
-
+#
 # Cort plots  -------------------------------------------------------------
 
 nestlingcort <- nestling_data %>% select(band, year, d12_base, d12_stress, d12_dex,
@@ -592,18 +592,20 @@ dev.off()
 
 
 
-# Telomere ~ treatment plots -----------------------------------------------------------
+# Telomere ~ treatment  -----------------------------------------------------------
 
-
+head(comp_data)
 # Stats
-mod17 <- lmer(ts_ratio1 ~ predator + dull + (1|gen_mom) + (1|site_nest),
+mod17 <- lmer(ts_ratio1 ~ predator + dull + scale(fbbright) +
+                fage + (1|gen_mom) + (1|site_nest),
      data = d18)
 
-mod18 <- lmer(ts_ratio1~ predator  + dull +  (1|gen_mom) + (1|site_nest),
+mod18 <- lmer(ts_ratio1~ predator  + dull + scale(fbbright) +
+                fage +  (1|gen_mom) + (1|site_nest),
      data = d19) #%>% summary
 tab_model(mod17, mod18,
          dv.labels = c("Relative telomere length (2018)", "Relative telomere length (2019)"),
-         pred.labels = c("Intercept (Controls)", "Predation", "Dull"))
+         pred.labels = c("Intercept (Controls)", "Predation", "Dull", "Scaled brightness", "Female Age"))
 # Figure nestlings telos ~ treatment
 
 # 2018
@@ -706,15 +708,21 @@ tab_model(mod23, mod24,
           dv.labels = c("Fledging success 2018", "Fledging success 2019"),
           pred.labels = c("Intercept (Controls)", "relative telomere length") )
 
+mod25 <- lmer(ts_ratio1 ~ d12_base + d12_stress + d12_dex + (1|site_nest), data = d18)
+mod26 <- lmer(ts_ratio1 ~ d12_base + d12_stress + d12_dex + (1|site_nest), data = d19)
+tab_model(mod25, mod26,
+          dv.labels = c("RTL 2018", "RTL 2019"),
+          pred.labels = c("Intercept", "Baseline cort", "Stress cort", "Post-dex cort"))
+plot(ts_ratio1 ~ log(d12_base), data = d19)
 
 # Survival analysis and fledging success -----------------------------------------------------------
 
 # Surv analysis + plot
 nsurv <- nestdata2018 %>% select(site_nest, year, clutch, maxbrood, numd6,
                                  numband, num_d15, numfled, full_treatment,
-                                 dull, predator, fbbright)
+                                 dull, predator, fbbright, fage)
 
-  nsurv <- nsurv %>% mutate(maxbrood = ifelse(is.na(maxbrood), 0, maxbrood)) %>%
+nsurv <- nsurv %>% mutate(maxbrood = ifelse(is.na(maxbrood), 0, maxbrood)) %>%
                      mutate(died_hatch = clutch - maxbrood,
                             died_5 = maxbrood - numd6,
                             died_11 = numd6 - numband,
@@ -741,10 +749,10 @@ nsurv <- nestdata2018 %>% select(site_nest, year, clutch, maxbrood, numd6,
   #              values_to # name of the new value column as a quoted string
   # )
   # check and make sure things add up
-  nsurv$check <-nsurv$clutch == nsurv$numfled + nsurv$died_hatch + nsurv$died_5 + nsurv$died_11 + nsurv$died_14 + nsurv$died_16
+nsurv$check <-nsurv$clutch == nsurv$numfled + nsurv$died_hatch + nsurv$died_5 + nsurv$died_11 + nsurv$died_14 + nsurv$died_16
 
-  nsurv <- nsurv %>% select(full_treatment, site_nest, died_hatch, died_5, died_11,
-                            died_14, died_16, numfled, year, dull, predator, fbbright) %>%
+nsurv <- nsurv %>% select(full_treatment, site_nest, died_hatch, died_5, died_11,
+                            died_14, died_16, numfled, year, dull, predator, fbbright, fage) %>%
                       pivot_longer(cols = c(died_hatch, died_5, died_11, died_14, died_16, numfled),
                       names_to = "end",
                       values_to = "number") %>%
@@ -759,15 +767,16 @@ nsurv <- nestdata2018 %>% select(site_nest, year, clutch, maxbrood, numd6,
     mutate(died = case_when(end == "numfled" ~ 0,
                             TRUE ~ 1 ))
 
-  # A check to make sure all the totals line up
+# A check to make sure all the totals line up
 
-  check <- table(nsurv$site_nest) %>% as.data.frame %>% rename(site_nest = Var1)
-  check <- left_join(check, select(nestdata2018, c(site_nest, clutch))) %>%
+check <- table(nsurv$site_nest) %>% as.data.frame %>% rename(site_nest = Var1)
+check <- left_join(check, select(nestdata2018, c(site_nest, clutch))) %>%
     mutate(check = Freq == clutch)
-  summary(check$check) # all good if TRUE
+summary(check$check) # all good if TRUE
 
 nestdata2018  <- nestdata2018 %>% mutate(numdied = clutch - numfled)
 
+# make sure totals from nsurv can be mutated back to the same numbers as in nestdata2018
 back_check <- nsurv %>% group_by(site_nest, died, year) %>% tally %>% pivot_wider(
     id_cols = c(site_nest, year),
     names_from = died,
@@ -775,9 +784,9 @@ back_check <- nsurv %>% group_by(site_nest, died, year) %>% tally %>% pivot_wide
     names_prefix = "died",
     values_fill = 0
   )
-  back_check <-select(nestdata2018, site_nest, numfled, numdied) %>% left_join(., back_check)
-  back_check$numdied == back_check$died1
-  back_check$numfled == back_check$died0
+back_check <-select(nestdata2018, site_nest, numfled, numdied) %>% left_join(., back_check)
+back_check$numdied == back_check$died1 # should be all true
+back_check$numfled == back_check$died0 # should be all true
 
 nsurv %>% filter(died == 1) %>% filter(year == 2018 & predator == "Predation") %>% tally #group_by(age) %>% tally
 
@@ -794,31 +803,35 @@ survplot18$plot + survplot19$plot + plot_annotation(tag_levels = 'A')
 dev.off()
 
 # Cox Proportional Hazards Models
-mod25 <- coxme(Surv(age, died) ~ predator + dull + (1|site_nest), data = nsurv[nsurv$year == 2018,]) %>% summary
-mod26 <- coxme(Surv(age, died) ~ predator + dull + (1|site_nest), data = nsurv[nsurv$year == 2019,]) %>% summary
+mod25 <- coxme(Surv(age, died) ~ predator + dull + scale(fbbright) + fage + (1|site_nest), data = nsurv[nsurv$year == 2018,]) %>% summary
+mod26 <- coxme(Surv(age, died) ~ predator + dull + scale(fbbright) + fage + (1|site_nest), data = nsurv[nsurv$year == 2019,]) %>% summary
 summary(mod25)
 tab_model(mod25, mod26, dv.labels = c("Hazard ratio nestling survival 2018",
                                       "Hazard ratio nestling survival 2019"),
-                                      pred.labels  = c("Predation", "Dulling"))
+                                      pred.labels  = c("Predation", "Dulling", "Female brightness (scaled)", "Female age"))
 
 # Fledging success glms
-mod27 <- glmer(died ~ predator + dull + (1|site_nest), data = nsurv[nsurv$year == 2018,], family = "binomial") #%>% summary
-mod28 <- glmer(died ~ predator + dull+ scale(fbbright)+ (1|site_nest), data = nsurv[nsurv$year == 2019,], family = "binomial") #%>% summary
+mod27 <- glmer(died ~ predator + dull + scale(fbbright) + fage + (1|site_nest), data = nsurv[nsurv$year == 2018,], family = "binomial") #%>% summary
+mod28 <- glmer(died ~ predator + dull+ scale(fbbright) + fage + (1|site_nest), data = nsurv[nsurv$year == 2019,], family = "binomial") #%>% summary
 tab_model(mod27, mod28, dv.labels = c("Fledging success 2018", "Fledging success 2019"),
-          pred.labels = c("Intercept (Controls)", "Predation", "Dulling", "Brightness"))
-aggregate(maxbrood/clutch ~ predator + year, data = nestdata2018, mean)
-summary(mod28)
+          pred.labels = c("Intercept (Controls)", "Predation", "Dull", "Female brightness (scaled)", "Female age"))
+# Number of fledglings per treatment
+aggregate(numfled ~ predator + year, data = nestdata2018, mean)
+aggregate(maxbrood ~ predator + year, data = nestdata2018, mean)
 
-
+aggregate(numfled ~ predator + year, data = nestdata2018, sum)
+aggregate(maxbrood ~ predator + year, data = nestdata2018, sum)
+29/95
+62/89
 # Check for differences in hatching success
 nestdata2018$nohatch <- nestdata2018$clutch - nestdata2018$maxbrood
-
-mod29 <- glmer(cbind(maxbrood, nohatch) ~ predator  + dull + (1|site_nest),
+aggregate(maxbrood/clutch ~ predator + year, data = nestdata2018, mean)
+mod29 <- glmer(cbind(maxbrood, nohatch) ~ dull + (1|site_nest),
       data = nestdata2018[nestdata2018$year == 2018,], family = "binomial")
-mod30 <- glmer(cbind(maxbrood, nohatch) ~ predator  + dull + (1|site_nest),
+mod30 <- glmer(cbind(maxbrood, nohatch) ~ predator  + (1|site_nest),
                data = nestdata2018[nestdata2018$year == 2019,], family = "binomial")
 tab_model(mod29, mod30, dv.labels = c("Hatching success 2018", "Hatching success 2019"),
-          pred.labels = c("Intercept (Controls)", "Predation", "Dulling"))
+          pred.labels = c("Intercept (Controls)", "Dulling", "Predation"))
 
 # Does original female brightness matter? no
 #glmer(cbind(maxbrood, nohatch) ~ predator  + dull*fbbright + (1|site_nest),
@@ -839,3 +852,66 @@ glmer(cbind(numdied, numfled) ~ predator + fbbright +
 
 
 
+# Response to reviewers ---------------------------------------------------
+
+# determining mean number of fledglings per year
+nestdata2018 %>%
+  filter(predator == "Control") %>%
+  group_by(year) %>%
+  summarize(mean_fledge = mean(numfled))
+head(nestdata2018)
+
+# Did clutch/brood size affect measures of nestling size?
+lmer(d12_head ~ predator + dull + scale(fbbright)  + maxbrood +(1|site_nest) + (1|gen_mom),
+data = nestling_data[nestling_data$year == "2018",]) %>% summary
+lmer(d12_wing ~ predator + dull + scale(fbbright)  + maxbrood +(1|site_nest) + (1|gen_mom),
+     data = nestling_data[nestling_data$year == "2018",]) %>% summary
+lmer(d12_mass ~ predator + dull + scale(fbbright)  + maxbrood +(1|site_nest) + (1|gen_mom),
+     data = nestling_data[nestling_data$year == "2018",]) %>% summary
+
+
+lmer(d12_head ~ predator + dull + scale(fbbright)  + maxbrood +(1|site_nest) + (1|gen_mom),
+     data = nestling_data[nestling_data$year == "2019",]) %>% summary
+lmer(d12_wing ~ predator + dull + scale(fbbright)  + maxbrood +(1|site_nest) + (1|gen_mom),
+     data = nestling_data[nestling_data$year == "2019",]) %>% summary
+lmer(d12_mass ~ predator + dull + scale(fbbright)  + maxbrood +(1|site_nest) + (1|gen_mom),
+     data = nestling_data[nestling_data$year == "2019",]) %>% summary
+
+# does including telomere effiency affect results?
+lmer(ts_ratio1 ~ predator + dull + (1|gen_mom) + (1|site_nest) + eff_gapdh +
+       eff_telo,  data = d18) %>% summary
+
+lmer(ts_ratio1 ~ predator + dull + (1|gen_mom) + (1|site_nest) + eff_gapdh +
+       eff_telo ,
+     data = d19) %>% summary
+cor(comp_data$ts_ratio1, comp_data$eff_telo, use = "complete.obs")
+
+par(mfrow = c(1,2))
+plot(ts_ratio1 ~ eff_telo, data= d18)
+plot(ts_ratio1 ~ eff_telo, data= d19)
+
+# Change in magnitude of cort: does this matter?
+lmer(ts_ratio1 ~  (d12_stress- d12_base)  + (1|site_nest), data = d18) %>% summary()
+lmer(ts_ratio1 ~  (d12_stress- d12_base)  + (1|site_nest), data = d19) %>% summary()
+
+lmer(ts_ratio1 ~  (d12_dex- d12_base)  + (1|site_nest), data = d18) %>% summary()
+lmer(ts_ratio1 ~  (d12_dex- d12_base)  + (1|site_nest), data = d19) %>% summary()
+
+lmer(ts_ratio1 ~  (d12_dex- d12_stress)  + (1|site_nest), data = d18) %>% summary()
+lmer(ts_ratio1 ~  (d12_dex- d12_stress)  + (1|site_nest), data = d19) %>% summary()
+
+# Does age of mother matter?
+head(nestling_data)
+lmer(d12_wing ~ predator + dull + scale(fbbright)  + fage + (1|site_nest) + (1|gen_mom),
+             data = nestling_data[nestling_data$year == "2018",]) %>% summary
+lmer(d12_wing ~ predator + dull* scale(fbbright) + fage + (1|site_nest) + (1|gen_mom),
+             data = nestling_data[nestling_data$year == "2019",]) %>% summary
+
+
+lmer(d12_head ~ predator + dull + scale(fbbright)+  (1|site_nest) ,
+             data = nestling_data[nestling_data$year == "2018",]) #%>% summary
+lmer(d12_head ~ predator + dull * scale(fbbright) +  (1|site_nest) + (1|gen_mom),
+             data = nestling_data[nestling_data$year == "2019",])
+
+# summary stats for abstract
+head(nestling_data)

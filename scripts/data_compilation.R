@@ -89,6 +89,8 @@ dim(comp_data_test)
 table(comp_data_test$full_treatment)
 table(comp_data_test$full_treatment, comp_data_test$year)
 
+# Additional cleaning to synonymize "dead" and "died" and exclude nests
+# that were not included in study.
 comp_data_test <-
   comp_data_test %>%
   mutate (Nestling_Fate = case_when (Nestling_Fate == "Dead" ~ "Died",
@@ -111,6 +113,7 @@ filter(nest_summary, Freq < Brood_Size_Day6) #32 nests have fewer blood samples 
 table(comp_data_test$in_xfost_exp) # all rows in x foster experiment
 comp_data_test$Bleed1_Glucose == comp_data_test$d12_bgluc # No glucose in 2018 but otherwise these match
 
+head(comp_data_test)
 # grab relevant columns
 comp_data <- comp_data_test %>% select(band, year, site_nest, ts_ratio1, ts_ratio2,
                                        ts_ratio3, ts_ratio4, Age, Mass, Flat_Wing,
@@ -122,7 +125,9 @@ comp_data <- comp_data_test %>% select(band, year, site_nest, ts_ratio1, ts_rati
                                        full_treatment, soc_mom, gen_mom, raised_nest,
                                        sex, d12_base, d12_stress, d12_dex, d15_acth,
                                        Current_Brood_Size,
-                                       maxbrood, Nestling_Fate, sex
+                                       maxbrood, Nestling_Fate, sex,
+                                       eff_gapdh, eff_telo, plate_eff_gapdh, plate_eff_telo,
+                                       fage
 )
 
 comp_data <- filter(comp_data, predator !="Stress") %>% droplevels()
@@ -155,7 +160,7 @@ dim(nestling_data)
 
 # Summary stats telomeres  ------------------------------------------------
 
-head(comp_data_test)
+
 
 mean(comp_data_test$used_260_280, na.rm = T)
 mean(comp_data_test$used_260_230)
@@ -172,10 +177,15 @@ mean(comp_data_test$eff_gapdh, na.rm = T)
 mean(comp_data_test$eff_telo, na.rm = T)
 mean(comp_data_test$plate_eff_gapdh, na.rm = T)
 mean(comp_data_test$plate_eff_telo,na.rm = T)
-
+head(comp_data)
 
 # write out data ----------------------------------------------------------
 
 write.csv(comp_data, file = "compiled_data/comp_data.csv", row.names = F)
 write.csv(nestling_data, file = "compiled_data/nestling_data.csv", row.names = F)
 write.csv(nestdata2018, file = "compiled_data/nestdata2018.csv", row.names = F)
+
+
+# response to reviewers ---------------------------------------------------
+
+
