@@ -1,5 +1,6 @@
 # mcnew_etal_tres_nestling_telos
-Data, scripts, and analysis for McNew et al. 2022 TRES nestling paper
+Data, scripts, and analysis for: Developmental stage-dependent effects of perceived predation risk on nestling tree swallows (Tachycineta bicolor). McNew et al. Ecology 2024
+
 
 Notes: 
 scripts/data_compilation.R contains the code used to compile data for this 
